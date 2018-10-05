@@ -16,6 +16,8 @@ server.get('/', (req, res) => {
   res.send('Is this working?')
 })
 
+// **PROJECTS**
+
 // #################### GET #######################
 
 // ******************** GET All Projects **********************
@@ -133,6 +135,100 @@ server.put('/projects/:id', (req, res) => {
     });
 });
 
+// **ACTIONS**
+
+// #################### GET #######################
+
+// ******************** GET All Actions **********************
+server.get('/actions', (req, res) => {
+  actionModel
+    .get()
+    .then((actions) => {
+      res.json(actions);
+    })
+    .catch(() => {
+      res.status(500).json({ Error: 'No action found bro/sis' });
+    });
+});
+
+// #################### GET #######################
+
+// ******************** GET Single Action **********************
+server.get('/actions/:id', (req, res) => {
+  actionModel
+    .get(req.params.id)
+    .then((action) => {
+      if (action === 0) {
+        res.status(404).json({ Message: 'No action like that exists...smh' });
+      } else {
+        res.json(action);
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ Error: 'Action is lost, sorry' });
+    });
+});
+// #################### POST #######################
+
+// ******************** POST Add Action **********************
+server.post('/actions', (req, res) => {
+  const action = req.body;
+  if (!action.project_id || !action.description || !action.notes) {
+    res.status(404).json({ Error: 'You left out something..maybe the id, description or the note' });
+  }
+  actionModel
+    .insert(action)
+    .then((action) => {
+      res.status(201).json(action);
+    })
+    .catch(() => {
+      res.status(500).json({ Error: `Yeah...about that save, it ain't work lol`});
+    });
+});
+
+// #################### DELETE #######################
+
+// ******************** DELETE Action **********************
+server.delete('/actions/:id', (req, res) => {
+  actionModel
+    .remove(req.params.id)
+    .then((action) => {
+      if (action === 0) {
+        res.status(404).json({ Message: `Can't delete it if it doesn't exist` });
+      } else {
+        res.status(200).json(action);
+      }
+    })
+    .catch(() => {
+      res.status(500).json({
+        Error: `Hmm...I'm not deleting this`
+      });
+    });
+});
+
+// #################### PUT #######################
+
+// ******************** UPDATE Action **********************
+server.put('/actions/:id', (req, res) => {
+  const { id } = req.params;
+  const action = req.body;
+  if (!action.project_id || !action.description || !action.notes) {
+    res.status(404).json({ Error: 'You left out something..maybe the id, description or the note' });
+  }
+  actionModel
+    .update(id, action)
+    .then((id) => {
+      if (id === 0) {
+        res.status(404).json({
+          Message: `Action ain't here...`
+        });
+      }
+      res.status(200).json(id);
+    })
+    .catch(() => {
+      res.status(500).json({ Error: 'Action NOT updated' });
+    });
+});
 
 // watch for traffic in a particular computer port
 const port = 9000;
